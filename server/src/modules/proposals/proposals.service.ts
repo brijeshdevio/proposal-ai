@@ -1,8 +1,34 @@
 import { prisma } from "../../lib/prisma";
-import { FindProposalsQueryDto } from "./proposals.schema";
+import { AIService } from "../ai/ai.service";
+import { ProfileService } from "../profile/profile.service";
+import { FindProposalsQueryDto, JobDto } from "./proposals.schema";
 
 export class ProposalsService {
-  constructor() {}
+  profileService: ProfileService;
+  aiService: AIService;
+
+  constructor() {
+    this.profileService = new ProfileService();
+    this.aiService = new AIService();
+  }
+
+  async generateProposal(userId: string, data: JobDto) {
+    const profile = await this.profileService.findProfile(userId);
+    const response = await this.aiService.generate(profile, data);
+
+    await prisma.proposal.create({
+      data: {
+        userId,
+        title: response.content?.title || "Untitled Proposal",
+        jobDescription: data.jobDescription,
+        tone: data.tone,
+        aiResponse: response.content,
+        tokensUsed: response.tokensUsed,
+        currency: data.currency,
+      },
+    });
+    return response;
+  }
 
   async findAll(userId: string, query: FindProposalsQueryDto) {
     const where: Record<string, unknown> = { userId };
