@@ -24,6 +24,16 @@ export class AuthService {
           name: data.name,
           email: data.email,
           passwordHash,
+          role: "user",
+          profile: {
+            create: {
+              skills: ["NestJS", "React", "PostgreSQL"],
+              experienceYears: 3,
+              defaultRateINR: 1500,
+              defaultRateUSD: 18,
+              bio: "Backend-focused full stack developer",
+            },
+          },
         },
         select: {
           id: true,
