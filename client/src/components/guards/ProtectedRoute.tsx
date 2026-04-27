@@ -87,7 +87,7 @@ export function ProtectedRoute() {
       {/* MAIN CONTENT */}
       <main className="mx-auto w-full">
         {/* TOP HEADER */}
-        <header className="mb-4 flex items-center justify-end border-b bg-card px-8 py-3">
+        <header className="flex items-center justify-end border-b bg-card px-8 py-3">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"

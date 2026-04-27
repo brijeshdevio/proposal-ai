@@ -89,7 +89,7 @@ const ToneBadge = ({ tone }: { tone: string }) => {
 
 export default function Dashboard() {
   return (
-    <div className="mx-auto max-w-7xl flex-1 px-8 pb-8">
+    <div className="mx-auto max-w-7xl flex-1 px-8 pt-4 pb-8">
       {/* WELCOME SECTION */}
       <div className="mt-2 mb-8">
         <h2 className="mb-2 flex items-center gap-2 text-3xl font-bold tracking-tight">

@@ -9,6 +9,7 @@ const Home = lazy(() => import("@/pages/public/Home"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const Login = lazy(() => import("@/pages/auth/Login"));
 const Dashboard = lazy(() => import("@/pages/protect/Dashboard"));
+const Proposals = lazy(() => import("@/pages/protect/Proposals"));
 
 export function AppRouter() {
   return (
@@ -20,6 +21,7 @@ export function AppRouter() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/proposals" element={<Proposals />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<Home />} />
