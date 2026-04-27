@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 
 export default function GenerateProposal() {
   return (
-    <div className="dark min-h-screen w-full flex-1 bg-background p-8 text-foreground">
+    <div className="min-h-screen w-full flex-1 bg-background p-8 text-foreground">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
         {/* LEFT COLUMN: Input Parameters */}
         <div className="flex max-w-md flex-1 flex-col gap-6">
