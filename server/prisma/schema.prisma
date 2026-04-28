@@ -105,7 +105,9 @@ model Profile {
   id     String @id @default(uuid())
   userId String @unique
 
+  title           String?
   skills          String[]
+  highlights      String[]
   experienceYears Int      @default(0)
   defaultRateINR  Float?
   defaultRateUSD  Float?
