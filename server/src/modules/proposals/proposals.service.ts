@@ -22,16 +22,32 @@ export class ProposalsService {
     const profile = await this.profileService.findProfile(userId);
     const response = await this.aiService.generate(profile, data);
 
-    await prisma.proposal.create({
-      data: {
-        userId,
-        title: response.content?.title || "Untitled Proposal",
-        jobDescription: data.jobDescription,
-        tone: data.tone,
-        aiResponse: response.content,
-        tokensUsed: response.tokensUsed,
-        currency: data.currency,
-      },
+    await prisma.$transaction(async (tx) => {
+      const proposal = await tx.proposal.create({
+        data: {
+          userId,
+          title: response.content?.title || "Untitled Proposal",
+          jobDescription: data.jobDescription,
+          tone: data.tone,
+          aiResponse: response.content,
+          tokensUsed: response.tokensUsed,
+          currency: data.currency,
+        },
+      });
+      await tx.aiSession.create({
+        data: {
+          userId,
+          aiResponse: JSON.stringify(response.content),
+          tokensUsed: response.tokensUsed,
+          durationMs: response.durationMs,
+          model: response.model,
+          promptSent: JSON.stringify({
+            role: "user",
+            content: data.jobDescription,
+          }),
+          proposalId: proposal.id,
+        },
+      });
     });
     return response;
   }

@@ -104,6 +104,8 @@ export class AIService {
       max_tokens: 1500,
     });
 
+    const durationMs = response.usage?.total_time ?? 0;
+    const model = response.model;
     const tokensUsed = response.usage?.total_tokens;
     const raw = response.choices[0]?.message?.content;
 
@@ -117,6 +119,8 @@ export class AIService {
       return {
         content: JSON.parse(cleaned),
         tokensUsed: tokensUsed ?? 0,
+        durationMs,
+        model,
       };
     } catch {
       throw new InternalServerErrorException("AI response is not valid JSON");
