@@ -34,4 +34,24 @@ export class ProposalsController {
       meta,
     });
   };
+
+  findOne = async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user?.id) throw new UnauthorizedException();
+    const proposalId = req.params.id as string;
+
+    const proposal = await this.proposalsService.findOne(user.id, proposalId);
+
+    apiResponse(res, { data: proposal });
+  };
+
+  deleteOne = async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user?.id) throw new UnauthorizedException();
+    const proposalId = req.params.id as string;
+
+    await this.proposalsService.deleteOne(user.id, proposalId);
+
+    apiResponse(res, { message: "Proposal deleted successfully" });
+  };
 }

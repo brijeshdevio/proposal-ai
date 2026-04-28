@@ -27,8 +27,6 @@ export const errorHandler = (
     return apiResponse(res, badRequestError.toResponse());
   }
 
-  console.log(err);
-
   if (err instanceof HttpException) {
     return apiResponse(res, err.toResponse());
   }

@@ -18,3 +18,5 @@ proposalsRoutes.post(
   validate(JobSchema),
   controllers.generateProposal,
 );
+proposalsRoutes.get("/:id", controllers.findOne);
+proposalsRoutes.delete("/:id", controllers.deleteOne);

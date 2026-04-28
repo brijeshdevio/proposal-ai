@@ -1,7 +1,13 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { prisma } from "../../lib/prisma";
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from "../../utils/error";
 import { AIService } from "../ai/ai.service";
 import { ProfileService } from "../profile/profile.service";
 import { FindProposalsQueryDto, JobDto } from "./proposals.schema";
+import { PRISMA_CODES } from "../../constants";
 
 export class ProposalsService {
   profileService: ProfileService;
@@ -70,5 +76,41 @@ export class ProposalsService {
         totalPages: Math.ceil(total / query.limit),
       },
     };
+  }
+
+  async findOne(userId: string, proposalId: string) {
+    const proposal = await prisma.proposal.findUnique({
+      where: {
+        id: proposalId,
+        userId,
+      },
+      omit: {
+        userId: true,
+      },
+    });
+    if (!proposal) {
+      throw new NotFoundException("Proposal not found");
+    }
+    return proposal;
+  }
+
+  async deleteOne(userId: string, proposalId: string) {
+    try {
+      await prisma.proposal.delete({
+        where: {
+          id: proposalId,
+          userId,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === PRISMA_CODES.NOT_FOUND
+      ) {
+        throw new NotFoundException("Proposal not found");
+      }
+
+      throw new InternalServerErrorException();
+    }
   }
 }
