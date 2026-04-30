@@ -3,6 +3,7 @@ import { ProposalsService } from "./proposals.service";
 import { ProposalsController } from "./proposals.controller";
 import { FindProposalsQuerySchema, JobSchema } from "./proposals.schema";
 import { validate } from "../../middleware/validate";
+import { rateLimit } from "../../middleware/rate-limit";
 
 export const proposalsRoutes = Router();
 
@@ -15,6 +16,11 @@ proposalsRoutes.get(
 );
 proposalsRoutes.post(
   "/generate",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: "Too many requests, please try again later.",
+  }),
   validate(JobSchema),
   controllers.generateProposal,
 );
