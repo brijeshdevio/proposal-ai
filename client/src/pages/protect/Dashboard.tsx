@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
 import {
   CalendarBlank,
   Clock,
@@ -88,12 +89,15 @@ const ToneBadge = ({ tone }: { tone: string }) => {
 };
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  console.log(user);
   return (
     <div className="mx-auto max-w-7xl flex-1 px-8 pt-4 pb-8">
       {/* WELCOME SECTION */}
       <div className="mt-2 mb-8">
         <h2 className="mb-2 flex items-center gap-2 text-3xl font-bold tracking-tight">
-          Good morning, Brijesh <span className="text-3xl">👋</span>
+          Good morning, {user?.name?.split(" ")[0]}{" "}
+          <span className="text-3xl">👋</span>
         </h2>
         <p className="text-muted-foreground">
           Here's a quick overview of your proposal activity.

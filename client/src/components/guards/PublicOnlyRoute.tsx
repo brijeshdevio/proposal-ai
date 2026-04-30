@@ -1,5 +1,8 @@
+import { useAuth } from "@/hooks/use-auth";
 import { CheckCircleIcon, SparkleIcon } from "@phosphor-icons/react";
-import { Link, Outlet } from "react-router-dom";
+import { Suspense } from "react";
+import { Link, Navigate, Outlet } from "react-router-dom";
+import { Spinner } from "../ui/spinner";
 
 const features = [
   {
@@ -17,6 +20,9 @@ const features = [
 ];
 
 export function PublicOnlyRoute() {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) return <Navigate to="/dashboard" />;
+
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="hidden h-screen w-1/2 items-center justify-center bg-secondary lg:flex">
@@ -52,7 +58,16 @@ export function PublicOnlyRoute() {
         </div>
       </div>
       <div className="items-center justify-center p-3 lg:flex lg:w-1/2">
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="text-center">
+              <Spinner className="mx-auto h-6 w-6" />
+              <span>Loading</span>
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </div>
     </main>
   );

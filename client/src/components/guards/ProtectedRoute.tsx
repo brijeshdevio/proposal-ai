@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import {
   SquaresFour,
   Sparkle,
@@ -22,6 +22,9 @@ import {
   SidebarTrigger,
 } from "../ui/sidebar";
 import { Button } from "../ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { Suspense } from "react";
+import { Spinner } from "../ui/spinner";
 
 // --- MOCK DATA ---
 const NAV_ITEMS = [
@@ -32,6 +35,9 @@ const NAV_ITEMS = [
 ];
 
 export function ProtectedRoute() {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
   return (
     <SidebarProvider>
       {/* SIDEBAR */}
@@ -85,25 +91,36 @@ export function ProtectedRoute() {
       </Sidebar>
       <SidebarTrigger className="md:hidden" />
       {/* MAIN CONTENT */}
-      <main className="mx-auto w-full">
-        {/* TOP HEADER */}
-        <header className="flex items-center justify-end border-b bg-card px-8 py-3">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-            >
-              <Bell size={24} />
-            </Button>
-            <Avatar className="h-9 w-9 border border-border">
-              <AvatarImage src="https://placehold.co/100x100" alt="User" />
-              <AvatarFallback>BR</AvatarFallback>
-            </Avatar>
+      <Suspense
+        fallback={
+          <div className="flex h-screen w-full items-center justify-center">
+            <div className="text-center">
+              <Spinner className="mx-auto h-6 w-6" />
+              <span>Loading</span>
+            </div>
           </div>
-        </header>
-        <Outlet />
-      </main>
+        }
+      >
+        <main className="mx-auto w-full">
+          {/* TOP HEADER */}
+          <header className="flex items-center justify-end border-b bg-card px-8 py-3">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground"
+              >
+                <Bell size={24} />
+              </Button>
+              <Avatar className="h-9 w-9 border border-border">
+                <AvatarImage src="https://placehold.co/100x100" alt="User" />
+                <AvatarFallback>BR</AvatarFallback>
+              </Avatar>
+            </div>
+          </header>
+          <Outlet />
+        </main>
+      </Suspense>
     </SidebarProvider>
   );
 }

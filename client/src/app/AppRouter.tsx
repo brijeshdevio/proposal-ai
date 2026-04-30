@@ -1,9 +1,10 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { PublicRoute } from "@/components/guards/PublicRoute";
 import { PublicOnlyRoute } from "@/components/guards/PublicOnlyRoute";
 import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
+import { Spinner } from "@/components/ui/spinner";
 
 const Home = lazy(() => import("@/pages/public/Home"));
 const Register = lazy(() => import("@/pages/auth/Register"));
@@ -16,23 +17,34 @@ const ProfileSettings = lazy(() => import("@/pages/protect/ProfileSettings"));
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<PublicOnlyRoute />}>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/proposals" element={<Proposals />} />
-          <Route path="/generate" element={<GenerateProposal />} />
-          <Route path="/proposals/:id" element={<ProposalDetails />} />
-          <Route path="/profile" element={<ProfileSettings />} />
-        </Route>
-        <Route element={<PublicRoute />}>
-          <Route index element={<Home />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center">
+          <div className="text-center">
+            <Spinner className="mx-auto h-6 w-6" />
+            <span>Loading</span>
+          </div>
+        </div>
+      }
+    >
+      <BrowserRouter>
+        <Routes>
+          <Route element={<PublicOnlyRoute />}>
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/proposals" element={<Proposals />} />
+            <Route path="/generate" element={<GenerateProposal />} />
+            <Route path="/proposals/:id" element={<ProposalDetails />} />
+            <Route path="/profile" element={<ProfileSettings />} />
+          </Route>
+          <Route element={<PublicRoute />}>
+            <Route index element={<Home />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </Suspense>
   );
 }

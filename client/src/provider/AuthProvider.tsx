@@ -1,24 +1,13 @@
-import { useState } from "react";
+import { AuthContext } from "@/context/auth-context";
+import { useGetMeQuery } from "@/features/users/users.hooks";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null); // current user object
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const queryClient = useQueryClient();
-
-  const login = useCallback((userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-  }, []);
-
-  const logout = useCallback(async () => {
-    await logoutApi();
-    setUser(null);
-    setIsAuthenticated(false);
-    queryClient.clear(); // wipe all cached queries on logout
-  }, [queryClient]);
+  const { isPending, data, isSuccess } = useGetMeQuery();
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ isPending, user: data?.data, isAuthenticated: isSuccess }}
+    >
       {children}
     </AuthContext.Provider>
   );
