@@ -7,8 +7,12 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useLoginFacade } from "@/features/auth/auth.hooks";
 
 export default function Login() {
+  const { handleSubmit, submit, register, errors, isPending } =
+    useLoginFacade();
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -20,11 +24,13 @@ export default function Login() {
         </div>
       </CardHeader>
       <CardContent>
-        <form className="space-y-3">
+        <form className="space-y-3" onSubmit={handleSubmit(submit)}>
           <Input
             label="Email Address"
             type="email"
             placeholder="lX5Zs@example.com"
+            {...register("email")}
+            error={errors.email}
           />
           <Input
             label="Password"
@@ -38,8 +44,12 @@ export default function Login() {
                 Forgot password?
               </Link>
             }
+            {...register("password")}
+            error={errors.password}
           />
-          <Button className="btn w-full">Log in</Button>
+          <Button type="submit" className="btn w-full" isLoading={isPending}>
+            Log in
+          </Button>
         </form>
       </CardContent>
       <CardFooter>

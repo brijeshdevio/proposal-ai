@@ -70,7 +70,7 @@ export function Input({
         />
       </div>
       {error && (
-        <span className="mt-0.5 text-[13px] text-destructive">
+        <span className="mt-0.5 text-[13px] text-destructive/80">
           {error?.message}
         </span>
       )}

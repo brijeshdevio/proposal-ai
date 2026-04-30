@@ -7,9 +7,13 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { useRegisterFacade } from "@/features/auth/auth.hooks";
 import { Link } from "react-router-dom";
 
 export default function Register() {
+  const { register, handleSubmit, submit, errors, isPending } =
+    useRegisterFacade();
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -21,18 +25,26 @@ export default function Register() {
         </div>
       </CardHeader>
       <CardContent>
-        <form className="space-y-3">
-          <Input label="Full Name" placeholder="John Doe" />
+        <form className="space-y-3" onSubmit={handleSubmit(submit)}>
+          <Input
+            label="Full Name"
+            placeholder="John Doe"
+            {...register("name")}
+            error={errors.name}
+          />
           <Input
             label="Email Address"
             type="email"
             placeholder="lX5Zs@example.com"
+            {...register("email")}
+            error={errors.email}
           />
-          <Input label="Password" type="password" placeholder="*********" />
           <Input
-            label="Confirm Password"
+            label="Password"
             type="password"
             placeholder="*********"
+            {...register("password")}
+            error={errors.password}
           />
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" />
@@ -48,7 +60,9 @@ export default function Register() {
               .
             </label>
           </div>
-          <Button className="btn w-full">Create Account</Button>
+          <Button type="submit" className="btn w-full" isLoading={isPending}>
+            Create Account
+          </Button>
         </form>
       </CardContent>
       <CardFooter>
