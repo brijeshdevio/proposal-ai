@@ -12,6 +12,7 @@ const Dashboard = lazy(() => import("@/pages/protect/Dashboard"));
 const Proposals = lazy(() => import("@/pages/protect/Proposals"));
 const GenerateProposal = lazy(() => import("@/pages/protect/GenerateProposal"));
 const ProposalDetails = lazy(() => import("@/pages/protect/ProposalDetails"));
+const ProfileSettings = lazy(() => import("@/pages/protect/ProfileSettings"));
 
 export function AppRouter() {
   return (
@@ -26,6 +27,7 @@ export function AppRouter() {
           <Route path="/proposals" element={<Proposals />} />
           <Route path="/generate" element={<GenerateProposal />} />
           <Route path="/proposals/:id" element={<ProposalDetails />} />
+          <Route path="/profile" element={<ProfileSettings />} />
         </Route>
         <Route element={<PublicRoute />}>
           <Route index element={<Home />} />
