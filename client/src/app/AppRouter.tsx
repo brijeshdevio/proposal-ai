@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Spinner } from "@/components/ui/spinner";
 import { PublicGuard } from "@/components/guards/PublicGuard";
+import { ProtectGuard } from "@/components/guards/ProtectGuard";
+
 
 const Home = lazy(() => import("@/pages/public/Home"));
 const Register = lazy(() => import("@/pages/auth/Register"));
@@ -31,7 +33,7 @@ export function AppRouter() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
           </Route>
-          <Route>
+          <Route element={<ProtectGuard/>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/proposals" element={<Proposals />} />
             <Route path="/generate" element={<GenerateProposal />} />
