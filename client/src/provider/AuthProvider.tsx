@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isPending, user: data?.data, isAuthenticated: isSuccess }}
+      value={{ isPending, user: data, isAuthenticated: isSuccess }}
     >
       {children}
     </AuthContext.Provider>

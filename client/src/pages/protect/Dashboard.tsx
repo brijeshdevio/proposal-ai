@@ -11,7 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useGetProposalsQuery,
+  useGetStatsQuery,
+} from "@/features/protect/protect.hooks";
 import { useAuth } from "@/hooks/use-auth";
+import { formatDateOrTime } from "@/utils/format-date-or-time";
+import { formatNumberShort } from "@/utils/format-number-short";
 import {
   CalendarBlank,
   Clock,
@@ -20,37 +26,6 @@ import {
   Plus,
   ShieldCheck,
 } from "@phosphor-icons/react";
-
-const STATS = [
-  {
-    title: "TOTAL PROPOSALS",
-    value: "25",
-    badge: "+12%",
-    badgeType: "positive",
-    icon: FileText,
-  },
-  {
-    title: "THIS MONTH",
-    value: "8",
-    badge: "+2",
-    badgeType: "positive",
-    icon: CalendarBlank,
-  },
-  {
-    title: "TOKENS USED",
-    value: "31.2k",
-    badge: "+5%",
-    badgeType: "negative",
-    icon: Coins,
-  },
-  {
-    title: "AVG GENERATION TIME",
-    value: "2.1s",
-    badge: "-0.3s",
-    badgeType: "positive",
-    icon: Clock,
-  },
-];
 
 const RECENT_PROPOSALS = [
   {
@@ -88,9 +63,145 @@ const ToneBadge = ({ tone }: { tone: string }) => {
   );
 };
 
+function Stats() {
+  const { data } = useGetStatsQuery();
+  console.log(data?.totalProposals);
+
+  const STATS = [
+    {
+      title: "TOTAL PROPOSALS",
+      value: data?.totalProposals,
+      badge: "+12%",
+      badgeType: "positive",
+      icon: FileText,
+    },
+    {
+      title: "THIS MONTH",
+      value: data?.proposalsThisMonth,
+      badge: "+2",
+      badgeType: "positive",
+      icon: CalendarBlank,
+    },
+    {
+      title: "TOKENS USED",
+      value: data?.totalTokensUsed?._sum?.tokensUsed,
+      badge: "+5%",
+      badgeType: "negative",
+      icon: Coins,
+    },
+    {
+      title: "AVG GENERATION TIME",
+      value: "2.1s",
+      badge: "-0.3s",
+      badgeType: "positive",
+      icon: Clock,
+    },
+  ];
+
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {STATS.map((stat, i) => (
+        <Card key={i} className="border-border/50 bg-card/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 pt-6 pb-2">
+            <CardTitle className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+              {stat.title}
+            </CardTitle>
+            <stat.icon
+              className="h-5 w-5 text-muted-foreground/30"
+              weight="fill"
+            />
+          </CardHeader>
+          <CardContent className="px-6 pt-0 pb-6">
+            <div className="mt-1 flex items-baseline gap-3">
+              <span className="text-4xl font-bold">
+                {formatNumberShort(stat.value || 0)}
+              </span>
+              <Badge
+                variant="secondary"
+                className={`rounded-md px-2 py-0.5 text-xs ${
+                  stat.badgeType === "positive"
+                    ? "bg-emerald-500/10 text-emerald-500"
+                    : "bg-destructive/10 text-destructive"
+                }`}
+              >
+                {stat.badge}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function Proposals() {
+  const { data } = useGetProposalsQuery();
+
+  return (
+    <Card className="border-border/50 bg-card/50">
+      <CardHeader className="flex flex-row items-center justify-between px-6 py-5">
+        <CardTitle className="text-xl font-semibold">
+          Recent Proposals
+        </CardTitle>
+        <Button variant="link" className="h-auto p-0 font-medium text-primary">
+          View All
+        </Button>
+      </CardHeader>
+      <CardContent className="px-0 pb-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border/50 hover:bg-transparent">
+              <TableHead className="px-6 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                Title
+              </TableHead>
+              <TableHead className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                Tone
+              </TableHead>
+              <TableHead className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                Date
+              </TableHead>
+              <TableHead className="px-6 text-right text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data?.data?.map((proposal, i) => (
+              <TableRow
+                key={i}
+                className="border-b border-border/50 last:border-0 hover:bg-muted/20"
+              >
+                <TableCell className="px-6 py-4 font-medium">
+                  {proposal.title}
+                </TableCell>
+                <TableCell className="py-4">
+                  <ToneBadge tone={proposal?.tone?.toUpperCase()} />
+                </TableCell>
+                <TableCell className="py-4 text-sm text-muted-foreground">
+                  {formatDateOrTime(proposal.createdAt)}
+                </TableCell>
+                <TableCell className="px-6 py-4 text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <span className="sr-only">Actions</span>
+                    ...
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
-  console.log(user);
+
   return (
     <div className="mx-auto max-w-7xl flex-1 px-8 pt-4 pb-8">
       {/* WELCOME SECTION */}
@@ -105,36 +216,7 @@ export default function Dashboard() {
       </div>
 
       {/* STATS GRID */}
-      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {STATS.map((stat, i) => (
-          <Card key={i} className="border-border/50 bg-card/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 px-6 pt-6 pb-2">
-              <CardTitle className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                {stat.title}
-              </CardTitle>
-              <stat.icon
-                className="h-5 w-5 text-muted-foreground/30"
-                weight="fill"
-              />
-            </CardHeader>
-            <CardContent className="px-6 pt-0 pb-6">
-              <div className="mt-1 flex items-baseline gap-3">
-                <span className="text-4xl font-bold">{stat.value}</span>
-                <Badge
-                  variant="secondary"
-                  className={`rounded-md px-2 py-0.5 text-xs ${
-                    stat.badgeType === "positive"
-                      ? "bg-emerald-500/10 text-emerald-500"
-                      : "bg-destructive/10 text-destructive"
-                  }`}
-                >
-                  {stat.badge}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Stats />
 
       {/* MIDDLE SECTION */}
       <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -231,67 +313,7 @@ export default function Dashboard() {
       </div>
 
       {/* RECENT PROPOSALS TABLE */}
-      <Card className="border-border/50 bg-card/50">
-        <CardHeader className="flex flex-row items-center justify-between px-6 py-5">
-          <CardTitle className="text-xl font-semibold">
-            Recent Proposals
-          </CardTitle>
-          <Button
-            variant="link"
-            className="h-auto p-0 font-medium text-primary"
-          >
-            View All
-          </Button>
-        </CardHeader>
-        <CardContent className="px-0 pb-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border/50 hover:bg-transparent">
-                <TableHead className="px-6 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                  Title
-                </TableHead>
-                <TableHead className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                  Tone
-                </TableHead>
-                <TableHead className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                  Date
-                </TableHead>
-                <TableHead className="px-6 text-right text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {RECENT_PROPOSALS.map((proposal, i) => (
-                <TableRow
-                  key={i}
-                  className="border-b border-border/50 last:border-0 hover:bg-muted/20"
-                >
-                  <TableCell className="px-6 py-4 font-medium">
-                    {proposal.title}
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <ToneBadge tone={proposal.tone} />
-                  </TableCell>
-                  <TableCell className="py-4 text-sm text-muted-foreground">
-                    {proposal.date}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      <span className="sr-only">Actions</span>
-                      ...
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <Proposals />
     </div>
   );
 }

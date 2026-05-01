@@ -3,7 +3,13 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/provider/AuthProvider";
 import { AppRouter } from "./AppRouter";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export function App() {
   return (

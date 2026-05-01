@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { UsersService } from "./users.service";
+import { transform } from "@/utils/transform";
 
 export function useGetMeQuery() {
   return useQuery({
@@ -7,5 +8,6 @@ export function useGetMeQuery() {
     queryFn: UsersService.getMeApi,
     retry: 0,
     staleTime: 5 * 60 * 1000,
+    select: transform,
   });
 }
