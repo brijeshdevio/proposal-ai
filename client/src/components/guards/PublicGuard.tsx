@@ -23,7 +23,7 @@ export function PublicGuard() {
         <div className="container mx-auto px-4 md:px-6 flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="font-bold text-xl tracking-tight text-foreground flex items-center gap-x-2">
-              <SparkleIcon size={30} className="text-primary" />
+              <SparkleIcon  className="text-primary h-7 w-7" />
               PropelAI
             </Link>
             <nav className="hidden md:flex gap-6">
