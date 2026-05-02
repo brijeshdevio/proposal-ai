@@ -25,16 +25,16 @@ model User {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String
+  name         String
   role         UserRole @default(USER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // relations
-  profile       Profile?
-  sessions      Session[]
-  proposals     Proposal[]
-  refreshTokens RefreshToken[]
+  profile   Profile?
+  sessions  Session[]
+  proposals Proposal[]
 
   @@index([createdAt])
 }
@@ -49,15 +49,16 @@ model Session {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
 }
 
 model RefreshToken {
-  id     String @id @default(uuid())
-  userId String
+  id        String @id @default(uuid())
+  sessionId String
 
   tokenHash String  @unique
   isRevoked Boolean @default(false)
@@ -65,17 +66,15 @@ model RefreshToken {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([expiresAt])
+  @@index([expiresAt, tokenHash])
 }
 
 model Profile {
   id     String @id @default(uuid())
   userId String @unique
 
-  name       String
   title      String?
   bio        String?
   skills     Json?

@@ -1,0 +1,29 @@
+import { CookieOptions, Response } from 'express';
+import { env } from 'src/config/env.config';
+
+export const setCookie = (
+  res: Response,
+  name: string,
+  value: string,
+  options?: CookieOptions,
+) => {
+  res.cookie(name, value, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    ...options,
+  });
+};
+
+export const clearCookie = (
+  res: Response,
+  name: string,
+  options?: CookieOptions,
+) => {
+  res.clearCookie(name, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    ...options,
+  });
+};
