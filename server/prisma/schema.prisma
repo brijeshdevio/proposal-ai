@@ -1,0 +1,140 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  REPLIED
+  HIRED
+  REJECTED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  profile       Profile?
+  sessions      Session[]
+  proposals     Proposal[]
+  refreshTokens RefreshToken[]
+
+  @@index([createdAt])
+}
+
+model Session {
+  id     String @id @default(uuid())
+  userId String
+
+  userAgent String?
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id     String @id @default(uuid())
+  userId String
+
+  tokenHash String  @unique
+  isRevoked Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  name       String
+  title      String?
+  bio        String?
+  skills     Json?
+  highlights Json?
+
+  experienceYears Int?
+  defaultRate     Float?
+  currency        String? @db.VarChar(10)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Proposal {
+  id     String @id @default(uuid())
+  userId String
+
+  title          String
+  jobDescription String
+  tone           String?
+
+  status ProposalStatus @default(DRAFT)
+
+  // lightweight tracking (V1)
+  sentAt    DateTime?
+  repliedAt DateTime?
+  hiredAt   DateTime?
+  revenue   Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions ProposalVersion[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ProposalVersion {
+  id         String @id @default(uuid())
+  proposalId String
+
+  content       String
+  versionNumber Int
+  isSelected    Boolean @default(false)
+
+  // optional AI metadata (V1 lightweight)
+  aiModel    String?
+  tokensUsed Int?
+
+  createdAt DateTime @default(now())
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@unique([proposalId, versionNumber])
+  @@index([proposalId])
+  @@index([isSelected])
+}
